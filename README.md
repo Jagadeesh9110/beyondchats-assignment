@@ -1,102 +1,101 @@
-# BeyondChats – Full Stack + AI Assignment
+# BeyondChats - Full Stack + AI Assignment
 
-This repository contains my submission for the **Full Stack Web Developer Intern** assignment at **BeyondChats**.
+This repository contains the submission for the **Full Stack Web Developer Intern** assignment at **BeyondChats**.
 
-The project demonstrates a complete end-to-end workflow involving:
-- Web scraping
-- REST APIs
-- Database integration
-- LLM-based content enhancement
-- A React-based frontend
+The project aims to demonstrate a complete workflow involving web scraping, RESTful API development, database management, and future integration with LLMs for content enhancement.
 
----
-
-## 🚀 Tech Stack
+## Tech Stack
 
 **Backend**
 - Node.js
 - Express.js
 - MongoDB (Mongoose)
-- Axios + Cheerio (scraping)
-- SerpAPI (Google Search)
-- Google Gemini API (LLM)
+- Axios & Cheerio (Web Scraping)
+- dotenv (Environment Management)
 
-**Frontend**
+**Frontend (Planned)**
 - React.js
-- Vercel (deployment)
+- Vite
 
 ---
 
-## 🧠 Assignment Breakdown
+## implementation Status
 
-### Phase 1 – Scraping & Backend APIs
-- Scraped the **5 oldest articles** from BeyondChats blogs.
-- Stored articles in MongoDB.
-- Implemented full CRUD APIs for articles.
+### Phase 1: Scraping & Backend APIs [Completed]
 
-### Phase 2 – Automation & LLM Enhancement
-- Built a Node.js script to:
-  - Fetch articles from backend APIs.
-  - Search article titles on Google using SerpAPI.
-  - Scrape top 2 ranking external articles.
-  - Use Gemini API to enhance formatting and content quality.
-  - Store updated articles along with references.
+**1. Data Collection Strategy**
+The requirement was to scrape the five oldest articles from the BeyondChats blog. 
+- **Challenge:** The blog listing pages use Client-Side Rendering (CSR), meaning the article list is populated dynamically via JavaScript. Standard HTML parsers like Cheerio cannot see this content on the listing pages immediately.
+- **Solution:** To ensure reliability and accuracy, the scraper is configured to directly target the URLs of the five oldest articles. These were identified from the last pagination indices (Page 15 containing the oldest entry, and Page 14 containing the next four).
 
-### Phase 3 – Frontend
-- React app to display:
-  - Original articles
-  - AI-enhanced articles
-  - Reference sources
-- Responsive and clean UI.
+**2. Scraper Implementation**
+- The script iterates through the targeted article URLs.
+- It fetches the HTML for each individual article page.
+- **Extraction:**
+  - **Title:** Extracted from the `h1` tag.
+  - **Content:** Aggregated from `<article>` paragraph tags to ensure full text retrieval.
+  - **Publication Date:** Parsed from `<time>` or metadata tags.
+  - **Slug:** Generated using `slugify` for clean URL handling.
+- **Duplicate Prevention:** The system checks the database for existing slugs before insertion to prevent duplicate entries.
+
+**3. REST APIs**
+A comprehensive set of RESTful endpoints has been implemented to manage the scraped data:
+- `GET /api/articles` - Retrieve all articles.
+- `GET /api/articles/:id` - Retrieve a specific article by ID.
+- `POST /api/articles` - Create a new article manually.
+- `PUT /api/articles/:id` - Update an existing article.
+- `DELETE /api/articles/:id` - Remove an article.
+
+### Phase 2: Automation & LLM Enhancement [Upcoming]
+Planned implementation for automating the content enhancement pipeline:
+- Integration with external search APIs (e.g., SerpAPI) to find related content.
+- Integration with LLMs (e.g., Google Gemini) to rewrite and enhance article content.
+- Storage of AI-generated content and references alongside the original data.
+
+### Phase 3: Frontend Development [Upcoming]
+Planned development of a responsive user interface:
+- **Article List Support:** Displaying the collection of articles.
+- **Comparison View:** A detailed view allowing users to toggle between the original scraped content and the AI-enhanced version.
 
 ---
 
-## 🏗 Architecture Overview
+## Setup Instructions
 
-Scraper → MongoDB → REST APIs → Automation Script → LLM → APIs → React Frontend
+### Backend Setup
 
-yaml
-Copy code
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-(See `/diagrams` for visual architecture.)
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   Create a `.env` file in the `backend` directory with your MongoDB connection string:
+   ```env
+   MONGO_URL=your_mongodb_connection_string
+   PORT=3000
+   ```
+
+4. Run the scraper (one-time setup to populate data):
+   ```bash
+   npm run scrape
+   # or
+   node scripts/scrapeOldestArticles.js
+   ```
+
+5. Start the server:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-## ⚙️ Local Setup Instructions
+## Author
 
-### Backend
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
-Frontend
-bash
-Copy code
-cd frontend
-npm install
-npm run dev
-🔑 Environment Variables
-Backend .env:
-
-makefile
-Copy code
-MONGODB_URI=
-SERP_API_KEY=
-GEMINI_API_KEY=
-🌐 Live Links
-Frontend: (Vercel link here)
-
-Backend APIs: (if deployed)
-
-📌 Notes
-Code is modular and well-documented.
-
-Commits are made frequently to reflect development progress.
-
-This project is built specifically for the BeyondChats assignment and will not be reused elsewhere.
-
-Author:
-Manyam Jagadeeswar Reddy
-B.Tech – Data Science & AI, IIIT Dharwad (2027)
-GitHub: https://github.com/Jagadeesh9110
+**Manyam Jagadeeswar Reddy**
+B.Tech - Data Science & AI, IIIT Dharwad (2027)
+GitHub: [Jagadeesh9110](https://github.com/Jagadeesh9110)
