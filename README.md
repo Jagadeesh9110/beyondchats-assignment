@@ -46,9 +46,19 @@ A comprehensive set of RESTful endpoints has been implemented to manage the scra
 - `PUT /api/articles/:id` - Update an existing article.
 - `DELETE /api/articles/:id` - Remove an article.
 
-### Phase 2: Automation & LLM Enhancement [Upcoming]
-Planned implementation for automating the content enhancement pipeline:
-- Integration with external search APIs (e.g., SerpAPI) to find related content.
+### Phase 2: Automation & LLM Enhancement (In Progress)
+
+**Step 1: Google Search Integration (Completed)**
+- **Objective:** Enhance articles with external context.
+- **Service Implemented:** `googleSearchService.js`
+- **Functionality:**
+  - Accepts an article title as input.
+  - Integration with **SerpAPI** to fetch organic Google search results.
+  - **Filtering Logic:** Automatically filters out "BeyondChats.com" domains to ensure external sources are prioritized.
+  - **Output:** Returns the top 2 most relevant external article links/titles.
+- **Verification:** Logic is independently tested and verified via `scripts/testGoogleSearch.js`.
+
+**Upcoming Steps:**
 - Integration with LLMs (e.g., Google Gemini) to rewrite and enhance article content.
 - Storage of AI-generated content and references alongside the original data.
 
