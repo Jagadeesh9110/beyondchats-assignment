@@ -112,51 +112,53 @@ This structured output is intentionally designed to support accurate citation, c
 - Tested independently via `scripts/testExternalScraper.js`.
 - Verified successful extraction on real editorial sites and safe skipping of invalid sources.
 
-**Step 3: Gemini Rewrite Orchestration & Citation Injection (Completed)**
+**Step 3: Gemini Rewrite Orchestration (Completed)**
 
-**Purpose of Step-3**
-This step orchestrates the full AI enhancement pipeline by coordinating internal article APIs, Google Search results, external content scraping, and Gemini-based rewriting. It emphasizes separation of concerns and production-oriented orchestration.
+**Objective:**
+Leverage Google Gemini Pro to rewrite scrapped articles into high-quality, engaging content while strictly adhering to factual accuracy and Markdown formatting.
 
-**Orchestration Flow**
-The runtime sequence is as follows:
-1. Fetch original articles from internal REST API.
-2. Search the article title on Google (Step-1).
-3. Scrape clean editorial content from external sources (Step-2).
-4. Construct a controlled Gemini prompt.
-5. Generate a rewritten article with references injected at the end.
+**Gemini API Integration:**
+- **Model:** `gemini-1.5-pro` (or latest available variant) via Google Generative AI SDK.
+- **Orchestration:** Controlled via `articleRewriteService.js`.
 
-**Gemini Prompt Design**
-The Gemini prompt is intentionally strict:
-- **Persona-based:** Acts as a senior technical editor.
-- **Reference Usage:** Reference articles are used ONLY for structure and depth.
-- **Hallucination Prevention:** Explicit rules to prevent hallucination.
-- **Originality:** No sentence copying allowed.
-- **Format:** Markdown-only output.
-- **Citations:** References appended in a dedicated section (no inline citations).
+**Prompt Design Philosophy:**
+We utilize a **Persona + Task + Constraints** prompting strategy to ensure high-fidelity outputs:
+1.  **Persona:** "You are a senior technical editor..."
+2.  **Task:** "Rewrite this article using the following external references for depth..."
+3.  **Constraints:**
+    -   **Markdown Only:** Strict adherence to Markdown headers, lists, and formatting.
+    -   **No Hallucinations:** Explicit instruction to use *only* provided context or verified general knowledge.
+    -   **No Copying:** Rewriting must be original in expression while preserving the core message.
+    -   **Citation Injection:** A dedicated "References" section is appended at the bottom, listing the source articles used.
 
-**Robustness & Real-World Handling**
-- **Skip Logic:** Articles are skipped if fewer than 2 valid editorial references are available.
-- **Quality Control:** Thin content is discarded via word-count validation.
-- **Error Handling:** SSL/network failures are handled gracefully; one failed article does not break the batch pipeline.
+**Output:**
+The service returns a fully rewritten Markdown string, ready for storage and display, with no inline artifacts or broken syntax.
 
-**Output Characteristics**
-Successful runs produce:
-- Fully rewritten Markdown articles.
-- Preserved original intent.
-- Improved structure and readability.
-- Reference section containing source titles and URLs.
+**Step 4: Publish AI-Enhanced Articles via API (Completed)**
 
-**Non-Goals**
-- AI-generated articles are **NOT** auto-published in this step.
-- Publishing is intentionally handled via a separate API endpoint for auditability.
+**Objective:**
+Seamlessly update the production database with AI-generated content through a standardized API, ensuring data consistency and auditability.
 
-**Why This Design Matters**
-This step demonstrates production thinking by prioritizing clear control over AI usage. It ensures traceability and safety, allowing for human review before content is live, and implements real-world failure tolerance to maintain pipeline stability.
+**End-to-End Orchestration:**
+The `enhanceArticles.js` script orchestrates the entire pipeline:
+1.  **Fetch:** Call `GET /api/articles` to get the list of original articles.
+2.  **Process (Loop):** For each article:
+    -   Trigger Google Search (Step 1).
+    -   Scrape Editorial Content (Step 2).
+    -   Generate Rewrite via Gemini (Step 3).
+    -   **Publish:** Call `PUT /api/articles/:id` (or specific endpoint) to update the record.
+    
+**Database Updates:**
+The following fields are updated in the `Article` model:
+-   `aiContent`: The complete Markdown rewrite.
+-   `references`: Array of objects `{ title, url, source }` used during rewriting.
+-   `isUpdatedByAI`: Boolean flag set to `true`.
 
-**Upcoming Steps:**
-- Storage of AI-generated content and references alongside the original data.
+**Robustness:**
+-   **Graceful Skipping:** If an article lacks sufficient external references (minimum 2), the pipeline logs a warning and skips it without crashing.
+-   **Idempotency:** The script can be re-run; it will re-process and update articles, allowing for iterative improvements to the prompt or scraper logic.
 
-### Phase 3: Frontend Development [Upcoming]
+**Phase 3: Frontend Development [Upcoming]**
 Planned development of a responsive user interface:
 - **Article List Support:** Displaying the collection of articles.
 - **Comparison View:** A detailed view allowing users to toggle between the original scraped content and the AI-enhanced version.
