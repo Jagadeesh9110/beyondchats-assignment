@@ -78,6 +78,40 @@ To ensure the LLM receives only clean, high-value textual context, we implemente
   5. Returns the top 2 remaining valid editorial links.
 - **Verification:** The logic is independently tested via `scripts/testGoogleSearch.js`.
 
+**Step 2: External Article Content Scraper (Completed)**
+
+**Objective:**
+Transform raw Google Search results into clean, high-quality textual inputs suitable for LLM-based rewriting, while remaining domain-agnostic and resilient to real-world web inconsistencies.
+
+**Key Challenges Addressed:**
+- **Variability:** External websites vary widely in structure (WordPress, custom CMS, marketing sites).
+- **Noise:** Pages often contain significant noise (ads, navigation, scripts, footers).
+- **Reliability:** Some domains fail due to SSL or network restrictions.
+- **Quality:** Thin or low-quality pages can degrade downstream LLM output.
+
+**Design & Implementation Strategy:**
+- Implemented a domain-agnostic scraper (`externalArticleScraper.js`) using Axios and Cheerio.
+- **Progressive Content Extraction:** Attempts multiple selectors in order:
+  1. `<article>` tag (preferred semantic source).
+  2. Common content containers (`.entry-content`, `.post-content`, etc.).
+  3. Paragraph aggregation fallback (`<p>` tags).
+- **Sanitization:** Introduced DOM sanitization to remove non-content elements (`script`, `nav`, `ads`, `iframes`, etc.).
+- **validation:** Enforced a minimum word threshold (300+ words) to eliminate thin or non-editorial pages.
+- **Resilience:** Implemented graceful failure handling for SSL/network errors, ensuring the pipeline continues without crashing.
+
+**Output Structure:**
+Each successfully scraped article produces:
+- Title
+- Source URL & domain
+- Cleaned textual content
+- Word count (for quality validation)
+
+This structured output is intentionally designed to support accurate citation, controlled LLM prompt construction, and safe storage alongside AI-generated content in later phases.
+
+**Verification:**
+- Tested independently via `scripts/testExternalScraper.js`.
+- Verified successful extraction on real editorial sites and safe skipping of invalid sources.
+
 **Upcoming Steps:**
 - Integration with LLMs (e.g., Google Gemini) to rewrite and enhance article content.
 - Storage of AI-generated content and references alongside the original data.
