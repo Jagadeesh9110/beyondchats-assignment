@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from "cors";
+
 import connectDB from './src/config/dbConnect.js';
 import articleRoutes from './src/routes/articleRoutes.js';
 
@@ -9,6 +11,13 @@ connectDB();
 const app = express();
 
 app.use(express.json());
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    })
+);
 
 app.get("/", (req, res) => {
     res.json({ status: "API running" });
