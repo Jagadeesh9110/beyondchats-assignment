@@ -62,6 +62,16 @@ const enhanceArticle = async () => {
                 title: article.title,
                 referencesUsed: rewrittenArticle.references.length
             });
+            await axios.put(
+                `${API_BASE_URL}/api/articles/${article._id}/ai`,
+                {
+                    aiContent: rewrittenArticle.aiContent,
+                    references: rewrittenArticle.references
+                }
+            );
+
+            console.log("AI article published successfully");
+
         }
 
     } catch (error) {
