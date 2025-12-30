@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchArticleById } from '../services/api';
+import ReactMarkdown from "react-markdown";
 
 const ArticleDetail = () => {
     const { id } = useParams();
@@ -56,14 +57,40 @@ const ArticleDetail = () => {
                 <div className="content-display">
                     {viewMode === 'original' ? (
                         <div>
-                            {article.original_content || article.content}
+                            {article.originalContent}
                         </div>
                     ) : (
                         <div>
-                            {article.ai_content || "No AI enhancement available for this article."}
+                            {article.aiContent ? (
+                                <>
+                                    {article.aiContent}
+
+                                    {article.references?.length > 0 && (
+                                        <>
+                                            <h3 style={{ marginTop: "2rem" }}>References</h3>
+                                            <ul>
+                                                {article.references.map((ref, i) => (
+                                                    <li key={i}>
+                                                        <a
+                                                            href={ref.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            {ref.title}
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                <p>No AI enhancement available for this article.</p>
+                            )}
                         </div>
                     )}
                 </div>
+
             </div>
         </div>
     );

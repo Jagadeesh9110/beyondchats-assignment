@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import ArticlesList from './pages/ArticlesList';
 import ArticleDetail from './pages/ArticleDetail';
 import './styles/App.css';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/article/:id" element={<ArticleDetail />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );
