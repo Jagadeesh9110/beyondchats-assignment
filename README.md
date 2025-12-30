@@ -19,7 +19,7 @@ The project aims to demonstrate a complete workflow involving web scraping, REST
 
 ---
 
-## implementation Status
+## Implementation Status
 
 ### Phase 1: Scraping & Backend APIs [Completed]
 
@@ -49,14 +49,34 @@ A comprehensive set of RESTful endpoints has been implemented to manage the scra
 ### Phase 2: Automation & LLM Enhancement (In Progress)
 
 **Step 1: Google Search Integration (Completed)**
-- **Objective:** Enhance articles with external context.
-- **Service Implemented:** `googleSearchService.js`
-- **Functionality:**
-  - Accepts an article title as input.
-  - Integration with **SerpAPI** to fetch organic Google search results.
-  - **Filtering Logic:** Automatically filters out "BeyondChats.com" domains to ensure external sources are prioritized.
-  - **Output:** Returns the top 2 most relevant external article links/titles.
-- **Verification:** Logic is independently tested and verified via `scripts/testGoogleSearch.js`.
+
+The goal of this step is to find high-quality educational context for each scraped article. However, relying on raw Google Search results presents a significant challenge: standard queries often return results that are unusable for an LLM-based rewrite pipeline, such as e-commerce pages (Amazon), social media posts, or video links.
+
+#### Editorial Source Filtering Strategy
+
+To ensure the LLM receives only clean, high-value textual context, we implemented a strict domain filtering strategy. This is not an arbitrary rule but a deliberate design decision to maintain pipeline stability.
+
+- **ACCEPTED Sources:**
+  - Independent Blogs
+  - Long-form articles and tutorials
+  - Verified informational websites
+
+- **REJECTED Sources:**
+  - **Product Listings (e.g., Amazon, Flipkart):** These pages contain unrelated metadata and no narrative content.
+  - **Social Media (e.g., Pinterest, Facebook, X/Twitter):** These are often behind login walls or contain unstructured, user-generated snippets.
+  - **Video Platforms (e.g., YouTube):** The pipeline is designed for text scraping, not video transcription.
+
+#### Implementation Details
+
+- **Service:** `googleSearchService.js`
+- **Engine:** Uses **SerpAPI** to fetch organic Google results.
+- **Logic:**
+  1. Accepts an article title as a query.
+  2. Fetches top 10 results.
+  3. Filters out the `beyondchats.com` domain (self-reference).
+  4. Applys a **Blocked Domain List** to aggressively remove known non-editorial domains (Amazon, Pinterest, etc.).
+  5. Returns the top 2 remaining valid editorial links.
+- **Verification:** The logic is independently tested via `scripts/testGoogleSearch.js`.
 
 **Upcoming Steps:**
 - Integration with LLMs (e.g., Google Gemini) to rewrite and enhance article content.
