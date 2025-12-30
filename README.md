@@ -112,8 +112,48 @@ This structured output is intentionally designed to support accurate citation, c
 - Tested independently via `scripts/testExternalScraper.js`.
 - Verified successful extraction on real editorial sites and safe skipping of invalid sources.
 
+**Step 3: Gemini Rewrite Orchestration & Citation Injection (Completed)**
+
+**Purpose of Step-3**
+This step orchestrates the full AI enhancement pipeline by coordinating internal article APIs, Google Search results, external content scraping, and Gemini-based rewriting. It emphasizes separation of concerns and production-oriented orchestration.
+
+**Orchestration Flow**
+The runtime sequence is as follows:
+1. Fetch original articles from internal REST API.
+2. Search the article title on Google (Step-1).
+3. Scrape clean editorial content from external sources (Step-2).
+4. Construct a controlled Gemini prompt.
+5. Generate a rewritten article with references injected at the end.
+
+**Gemini Prompt Design**
+The Gemini prompt is intentionally strict:
+- **Persona-based:** Acts as a senior technical editor.
+- **Reference Usage:** Reference articles are used ONLY for structure and depth.
+- **Hallucination Prevention:** Explicit rules to prevent hallucination.
+- **Originality:** No sentence copying allowed.
+- **Format:** Markdown-only output.
+- **Citations:** References appended in a dedicated section (no inline citations).
+
+**Robustness & Real-World Handling**
+- **Skip Logic:** Articles are skipped if fewer than 2 valid editorial references are available.
+- **Quality Control:** Thin content is discarded via word-count validation.
+- **Error Handling:** SSL/network failures are handled gracefully; one failed article does not break the batch pipeline.
+
+**Output Characteristics**
+Successful runs produce:
+- Fully rewritten Markdown articles.
+- Preserved original intent.
+- Improved structure and readability.
+- Reference section containing source titles and URLs.
+
+**Non-Goals**
+- AI-generated articles are **NOT** auto-published in this step.
+- Publishing is intentionally handled via a separate API endpoint for auditability.
+
+**Why This Design Matters**
+This step demonstrates production thinking by prioritizing clear control over AI usage. It ensures traceability and safety, allowing for human review before content is live, and implements real-world failure tolerance to maintain pipeline stability.
+
 **Upcoming Steps:**
-- Integration with LLMs (e.g., Google Gemini) to rewrite and enhance article content.
 - Storage of AI-generated content and references alongside the original data.
 
 ### Phase 3: Frontend Development [Upcoming]
