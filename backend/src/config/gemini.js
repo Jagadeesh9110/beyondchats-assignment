@@ -1,40 +1,25 @@
-import axios from "axios";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+dotenv.config();
 
-if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY is not defined");
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    console.error("❌ GEMINI_API_KEY is missing in .env");
+    process.exit(1);
 }
 
-export const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
 
-const callGemini = async (prompt) => {
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+export const callGemini = async (prompt) => {
     try {
-        const response = await axios.post(GEMINI_URL, {
-            contents: [
-                {
-                    parts: [{ text: prompt }]
-                }
-            ]
-        },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        const text =
-            response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!text) {
-            throw new Error("Empty response from Gemini");
-        }
-
-        return text;
-    } catch (err) {
-        console.log("Error in callGemini", err.message);
-        throw err;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+    } catch (error) {
+        console.error("❌ Gemini API Error:", error.message);
+        throw error;
     }
-}
-
-export default callGemini;
+};

@@ -55,7 +55,8 @@ const ArticleSchema = new mongoose.Schema(
         // metadata
         isUpdatedByAI: {
             type: Boolean,
-            default: false
+            default: false,
+            index: true
         },
 
         sourceUrl: {

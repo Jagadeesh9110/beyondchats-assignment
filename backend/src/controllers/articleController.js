@@ -72,3 +72,34 @@ export const deleteArticle = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Publish AI-enhanced article (Phase-2)
+export const publishAIArticle = async (req, res) => {
+    try {
+        const { aiContent, references, isUpdatedByAI, ...safeBody } = req.body;
+
+        if (!aiContent || !references || references.length < 2) {
+            return res.status(400).json({
+                error: "AI content and at least 2 references are required"
+            });
+        }
+
+        const article = await Article.findByIdAndUpdate(
+            req.params.id,
+            {
+                aiContent,
+                references,
+                isUpdatedByAI: true
+            },
+            { new: true }
+        );
+
+        if (!article) {
+            return res.status(404).json({ error: "Article not found" });
+        }
+
+        res.status(200).json(article);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
