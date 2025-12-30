@@ -158,10 +158,21 @@ The following fields are updated in the `Article` model:
 -   **Graceful Skipping:** If an article lacks sufficient external references (minimum 2), the pipeline logs a warning and skips it without crashing.
 -   **Idempotency:** The script can be re-run; it will re-process and update articles, allowing for iterative improvements to the prompt or scraper logic.
 
-**Phase 3: Frontend Development [Upcoming]**
-Planned development of a responsive user interface:
-- **Article List Support:** Displaying the collection of articles.
-- **Comparison View:** A detailed view allowing users to toggle between the original scraped content and the AI-enhanced version.
+**Phase 3: Frontend Development (Completed)**
+
+**Architecture:**
+- **Framework:** React.js + Vite for fast build and optimal performance.
+- **Routing:** `react-router-dom` for client-side navigation.
+- **Styling:** CSS Modules / Custom CSS for responsive design.
+
+**Key Features Implemented:**
+- **Article List View:** Displays all scraped articles in a responsive grid layout with titles, excerpts, and dates.
+- **AI-Enhanced Detail View:**
+  - Standard view for original content.
+  - **Comparison Toggle:** Allows users to switch between the "Original" and "AI Enhanced" versions.
+  - **References Section:** In the AI view, a dedicated section lists the external sources used for the rewrite, linking directly to the original/editorial domains.
+  - **Markdown Rendering:** AI content is rendered with proper formatting (headers, lists, bold text) using `react-markdown`.
+- **Responsive UI:** Optimized for both desktop and mobile viewing with clean, professional aesthetics.
 
 ---
 
@@ -180,10 +191,14 @@ Planned development of a responsive user interface:
    ```
 
 3. Configure environment variables:
-   Create a `.env` file in the `backend` directory with your MongoDB connection string:
+   Create a `.env` file in the `backend` directory with at least:
    ```env
    MONGO_URL=your_mongodb_connection_string
    PORT=3000
+   SERP_API_KEY=your_serp_key
+   GEMINI_API_KEY=your_gemini_key
+   API_BASE_URL=http://localhost:3000
+   FRONTEND_URL=http://localhost:5173
    ```
 
 4. Run the scraper (one-time setup to populate data):
@@ -198,7 +213,30 @@ Planned development of a responsive user interface:
    npm run dev
    ```
 
----
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   Create a `.env` file in the `frontend` directory:
+   ```env
+   VITE_API_BASE_URL=http://localhost:3000/api
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Access the application at `http://localhost:5173`.
 
 ## Author
 
