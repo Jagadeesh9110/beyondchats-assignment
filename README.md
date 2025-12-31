@@ -7,6 +7,7 @@ The project aims to demonstrate a complete workflow involving web scraping, REST
 ## Table of Contents
 - Tech Stack
 - Live Deployment
+- Data & AI Output Validation
 - Architecture Overview
 - Folder Structure
 - Implementation Phases
@@ -57,6 +58,32 @@ To ensure transparency and facilitate review, a snapshot of the final MongoDB da
 ## Architecture Overview
 
 **Scraper** (Data Collection) → **Database** (Raw Storage) → **REST API** (Data Access) → **AI Orchestrator** (Google Search + Ext. Scraper + Gemini) → **Database** (Update with AI Content) → **React Frontend** (Display & Interaction)
+
+### High-Level Data Flow Diagram
+
+```mermaid
+graph TD
+    A[Start: One-time Scraper] -->|Saves Articles| B[(MongoDB)]
+    C[Express REST API] -->|Reads/Writes| B
+    subgraph "AI Orchestration Pipeline"
+        D[Enhance Script] -->|Fetch Original| C
+        D -->|1. Search Title| E[Google Search (SerpAPI)]
+        E -->|2. Get Editorial Links| F[External Scraper]
+        F -->|3. Extract Content| G[Gemini Pro LLM]
+        G -->|4. Generate Rewrite + References| D
+        D -->|5. Update Article| C
+    end
+    H[React Frontend] -->|Consumes Data| C
+    H -->|Displays UI| I[User Browser]
+```
+
+**Data Flow Explanation:**
+1.  **Initial Scraping:** The `scrapeOldestArticles.js` script fetches raw structure from the blog and populates MongoDB with initial 5 articles.
+2.  **API Serving:** The Express server exposes this data via REST endpoints (`/api/articles`).
+3.  **AI Orchestration:** The `enhanceArticles.js` script fetches each article and queries Google Search for editorial context.
+4.  **Content Enhancement:** Relevant content is scraped from external sources and fed into Gemini Pro with a strict "Technical Editor" persona prompt.
+5.  **Persistence:** The LLM output (rewrite + references) is sent back to the API (`PUT /api/articles/:id/ai`) and stored in MongoDB.
+6.  **Frontend Rendering:** The React app fetches the finalized data, rendering Markdown content and citations in a responsive UI.
 
 ---
 
