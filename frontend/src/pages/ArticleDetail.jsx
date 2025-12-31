@@ -63,7 +63,7 @@ const ArticleDetail = () => {
                         <div>
                             {article.aiContent ? (
                                 <>
-                                    {article.aiContent}
+                                    <ReactMarkdown>{article.aiContent}</ReactMarkdown>
 
                                     {article.references?.length > 0 && (
                                         <>
