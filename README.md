@@ -2,7 +2,15 @@
 
 This repository contains the submission for the **Full Stack Web Developer Intern** assignment at **BeyondChats**.
 
-The project aims to demonstrate a complete workflow involving web scraping, RESTful API development, database management, and future integration with LLMs for content enhancement.
+The project aims to demonstrate a complete workflow involving web scraping, RESTful API development, database management, and automated AI-driven content enhancement using LLMs.
+
+## Table of Contents
+- Tech Stack
+- Live Deployment
+- Architecture Overview
+- Folder Structure
+- Implementation Phases
+- Setup Instructions
 
 ## Tech Stack
 
@@ -12,14 +20,94 @@ The project aims to demonstrate a complete workflow involving web scraping, REST
 - MongoDB (Mongoose)
 - Axios & Cheerio (Web Scraping)
 - dotenv (Environment Management)
+- **Deployment:** Render
 
-**Frontend (Planned)**
+**Frontend**
 - React.js
 - Vite
+- react-markdown (Markdown Rendering)
+- **Deployment:** Vercel
 
 ---
 
-## Implementation Status
+## Live Deployment
+
+- **Frontend Application:** https://beyondchats-assignment-ochre-seven.vercel.app/
+- **Backend API:** https://beyondchats-assignment-x5tv.onrender.com
+
+> **Note:** The backend is configured with secure CORS settings to allow requests exclusively from the frontend domain.
+
+---
+
+## Data & AI Output Validation
+
+To ensure transparency and facilitate review, a snapshot of the final MongoDB database (including AI-generated content and references) is provided below. This confirms that the pipeline successfully enhances articles with structured, citation-backed rewrites.
+
+📥 **MongoDB JSON Export:** [Download Dataset Snapshot](https://drive.google.com/file/d/1ESeZYzRfahk9naBU4XkW1CCgvJFLrol7/view?usp=sharing)
+
+**Data Structure Includes:**
+- `originalContent`: Scraped from source.
+- `aiContent`: Markdown-formatted rewrite.
+- `references`: Array of `{title, url, source}` objects.
+
+---
+
+## Architecture Overview
+
+**Scraper** (Data Collection) → **Database** (Raw Storage) → **REST API** (Data Access) → **AI Orchestrator** (Google Search + Ext. Scraper + Gemini) → **Database** (Update with AI Content) → **React Frontend** (Display & Interaction)
+
+---
+
+## Folder Structure
+
+**Backend:**
+- `backend/`
+  - `scripts/`
+    - `enhanceArticles.js`
+    - `scrapeOldestArticles.js`
+    - `testExternalScraper.js`
+    - `testGoogleSearch.js`
+  - `src/`
+    - `config/`
+      - `dbConnect.js`
+      - `gemini.js`
+    - `controllers/`
+      - `articleController.js`
+    - `models/`
+      - `Article.js`
+    - `routes/`
+      - `articleRoutes.js`
+    - `services/`
+      - `articleRewriteService.js`
+      - `articleScraper.js`
+      - `externalArticleScraper.js`
+      - `googleSearchService.js`
+  - `server.js`
+
+**Frontend:**
+- `frontend/`
+  - `src/`
+    - `components/`
+      - `ArticleCard.jsx`
+      - `Navbar.jsx`
+      - `Footer.jsx`
+    - `pages/`
+      - `ArticlesList.jsx`
+      - `ArticleDetail.jsx`
+    - `services/`
+      - `api.js`
+    - `styles/`
+      - `App.css`
+    - `App.jsx`
+    - `main.jsx`
+  - `index.html`
+  - `vite.config.js`
+
+The `scripts/` directory contains standalone orchestration scripts for scraping and AI enhancement (one-time tasks). `src/services/` contains reusable business logic for scraping, searching, and rewriting. `frontend/services/api.js` acts as the centralized API abstraction layer for frontend-backend communication.
+
+---
+
+## Implementation Phases
 
 ### Phase 1: Scraping & Backend APIs [Completed]
 
@@ -43,10 +131,11 @@ A comprehensive set of RESTful endpoints has been implemented to manage the scra
 - `GET /api/articles` - Retrieve all articles.
 - `GET /api/articles/:id` - Retrieve a specific article by ID.
 - `POST /api/articles` - Create a new article manually.
-- `PUT /api/articles/:id` - Update an existing article.
+- `PUT /api/articles/:id` - Update an existing article (manual edits).
+- `PUT /api/articles/:id/ai` - Publish AI-enhanced content and references.
 - `DELETE /api/articles/:id` - Remove an article.
 
-### Phase 2: Automation & LLM Enhancement (In Progress)
+### Phase 2: Automation & LLM Enhancement (Completed)
 
 **Step 1: Google Search Integration (Completed)**
 
@@ -146,7 +235,7 @@ The `enhanceArticles.js` script orchestrates the entire pipeline:
     -   Trigger Google Search (Step 1).
     -   Scrape Editorial Content (Step 2).
     -   Generate Rewrite via Gemini (Step 3).
-    -   **Publish:** Call `PUT /api/articles/:id` (or specific endpoint) to update the record.
+    -   **Publish:** Call `PUT /api/articles/:id/ai` to persist the AI-generated content, references, and update metadata.
     
 **Database Updates:**
 The following fields are updated in the `Article` model:
@@ -158,7 +247,9 @@ The following fields are updated in the `Article` model:
 -   **Graceful Skipping:** If an article lacks sufficient external references (minimum 2), the pipeline logs a warning and skips it without crashing.
 -   **Idempotency:** The script can be re-run; it will re-process and update articles, allowing for iterative improvements to the prompt or scraper logic.
 
-**Phase 3: Frontend Development (Completed)**
+> **Status:** AI-enhanced articles have been successfully generated, stored, and are now live on the frontend, featuring full markdown rendering and citation links.
+
+### Phase 3: Frontend Development (Completed)
 
 **Architecture:**
 - **Framework:** React.js + Vite for fast build and optimal performance.
@@ -200,6 +291,7 @@ The following fields are updated in the `Article` model:
    API_BASE_URL=http://localhost:3000
    FRONTEND_URL=http://localhost:5173
    ```
+   > **Note:** `API_BASE_URL` is primarily required for the one-time AI orchestration scripts (`scripts/enhanceArticles.js`). The production API server itself does not depend on it for normal operation.
 
 4. Run the scraper (one-time setup to populate data):
    ```bash
@@ -237,6 +329,8 @@ The following fields are updated in the `Article` model:
    ```
 
 5. Access the application at `http://localhost:5173`.
+
+---
 
 ## Author
 
