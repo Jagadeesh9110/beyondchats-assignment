@@ -65,16 +65,19 @@ To ensure transparency and facilitate review, a snapshot of the final MongoDB da
 graph TD
     A[Start: One-time Scraper] -->|Saves Articles| B[(MongoDB)]
     C[Express REST API] -->|Reads/Writes| B
-    subgraph "AI Orchestration Pipeline"
+
+    subgraph AI_Orchestration_Pipeline
         D[Enhance Script] -->|Fetch Original| C
-        D -->|1. Search Title| E[Google Search (SerpAPI)]
-        E -->|2. Get Editorial Links| F[External Scraper]
-        F -->|3. Extract Content| G[Gemini Pro LLM]
-        G -->|4. Generate Rewrite + References| D
-        D -->|5. Update Article| C
+        D -->|Search Article Title| E[Google Search - SerpAPI]
+        E -->|Get Editorial Links| F[External Article Scraper]
+        F -->|Extract Clean Content| G[Gemini Pro LLM]
+        G -->|Generate Rewrite and References| D
+        D -->|Update Article| C
     end
-    H[React Frontend] -->|Consumes Data| C
-    H -->|Displays UI| I[User Browser]
+
+    H[React Frontend] -->|Consumes API Data| C
+    H -->|Renders UI| I[User Browser]
+
 ```
 
 **Data Flow Explanation:**
