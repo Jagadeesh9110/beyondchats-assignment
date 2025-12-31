@@ -19,8 +19,10 @@ The project aims to demonstrate a complete workflow involving web scraping, REST
 - Express.js
 - MongoDB (Mongoose)
 - Axios & Cheerio (Web Scraping)
+- SerpAPI (Google Search Integration)
+- Google Gemini API (LLM-based Content Rewriting)
 - dotenv (Environment Management)
-- **Deployment:** Render
+- Deployment: Render
 
 **Frontend**
 - React.js
